@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class FavoriteProvider with ChangeNotifier {
   late SharedPreferences _prefs;
-  final List<Data> allUsers; // Add this line to store the list of all users
+  final List<Data> allUsers;
 
   // Key for local storage
   static const String favoritesKey = 'favorites';
@@ -13,9 +13,11 @@ class FavoriteProvider with ChangeNotifier {
 
   List<Data> get favorites => _favorites;
 
-  FavoriteProvider(this.allUsers); // Update the constructor to accept all users
+  FavoriteProvider(this.allUsers) {
+    _loadFavorites();
+  }
 
-  void _loadFavorites() async {
+  Future<void> _loadFavorites() async {
     _prefs = await SharedPreferences.getInstance();
     List<String>? favoriteIds = _prefs.getStringList(favoritesKey);
     if (favoriteIds != null) {
@@ -30,14 +32,12 @@ class FavoriteProvider with ChangeNotifier {
     if (!_favorites.contains(data)) {
       _favorites.add(data);
       _saveFavorites();
-      notifyListeners();
     }
   }
 
   void removeFromFavorites(Data data) {
     _favorites.remove(data);
     _saveFavorites();
-    notifyListeners();
   }
 
   void _saveFavorites() {
